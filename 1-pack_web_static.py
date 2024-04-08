@@ -1,30 +1,27 @@
-from fabric import Connection, task
-from fabric.operations import local
+#!/usr/bin/python3
+"""Fabric script that Generates a .tgz archive"""
+from fabric.api import local
 from datetime import datetime
+import os
 
-c = Connection(
-        host="52.91.118.162",
-        user="ubuntu",
-        connect_kwargs={
-            "key_filename": "/home/badawii/.ssh/id_rsa",
-        },
-)
 
-@task
-def do_pack(c):
+def do_pack():
+    '''Packs the contents of the web_static folder into a .tgz archive'''
     now = datetime.now()
-    timestamp = now.strftime("%Y%m%d%H%M%S")
+    datetime_format = '%Y%m%d%H%M%S'
+    formatted_time = now.strftime(datetime_format)
+    archive_path = 'versions/web_static_{}.tgz'.format(formatted_time)
 
-    with c.local.cwd('~/'):  # Change to the appropriate directory
-        local("mkdir -p versions")
+    local('mkdir -p versions')
+    result = local('tar -cvzf {} web_static'.format(
+        archive_path), capture=True)
 
-        archive_name = "web_static_{}.tgz".format(timestamp)
-        archive_path = "versions/{}".format(archive_name)
+    if result.failed:
+        print('Failed to pack web_static')
+        return None
 
-        result = local("tar -czvf {} web_static".format(archive_path), capture=True)
-
-        if result.succeeded:
-            return archive_path
-        else:
-            return None
+    archive_size = os.path.getsize(archive_path)
+    print('web_static packed: {} -> {}Bytes'.format(archive_path,
+                                                    archive_size))
+    return archive_path
 
