@@ -24,4 +24,3 @@ def do_pack():
     print('web_static packed: {} -> {}Bytes'.format(archive_path,
                                                     archive_size))
     return archive_path
-
