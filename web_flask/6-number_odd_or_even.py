@@ -1,6 +1,8 @@
 #!/usr/bin/python3
-from flask import Flask, render_template
+"""script that starts a Flask web application"""
 
+
+from flask import Flask, render_template
 app = Flask(__name__)
 
 
@@ -29,6 +31,7 @@ def py():
 def py_text(text):
     text = text.replace('_', ' ')
     return f'Python {text}'
+
 
 @app.route('/number/<int:n>')
 def num(n):
