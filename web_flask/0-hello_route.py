@@ -10,7 +10,7 @@ app = Flask(__name__)
 
 @app.route('/', strict_slashes=False)
 def hello():
-    """Return string when route queired
+    """Return string when route queired"""
     return 'Hello HBNB!'
 
 
