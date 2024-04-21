@@ -34,7 +34,7 @@ def py_text(text):
 
 @app.route('/number/<int:n>')
 def num(n):
-    return f'{n}'
+    return f'{n} is a number'
 
 
 if __name__ == '__main__':
