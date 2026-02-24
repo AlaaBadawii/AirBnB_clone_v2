@@ -113,18 +113,97 @@ class HBNBCommand(cmd.Cmd):
         """ Overrides the emptyline method of CMD """
         pass
 
+    # def do_create(self, args):
+    #     """ Create an object of any class"""
+    #     if not args:
+    #         print("** class name missing **")
+    #         return
+    #     elif args not in HBNBCommand.classes:
+    #         print("** class doesn't exist **")
+    #         return
+    #     new_instance = HBNBCommand.classes[args]()
+    #     storage.save()
+    #     print(new_instance.id)
+    #     storage.save()
     def do_create(self, args):
-        """ Create an object of any class"""
+        """Create an object of any class with parameters."""
+        import re
+
         if not args:
             print("** class name missing **")
             return
-        elif args not in HBNBCommand.classes:
+
+        tokens = []
+        current_token = ""
+        inside_quotes = False
+        escape_next = False
+
+        # Step 1: Char-by-char split into tokens
+        for c in args:
+            if escape_next:
+                current_token += c
+                escape_next = False
+            elif c == '\\' and inside_quotes:
+                escape_next = True
+            elif c == '"':
+                inside_quotes = not inside_quotes
+                current_token += c
+            elif c == ' ' and not inside_quotes:
+                if current_token:
+                    tokens.append(current_token)
+                    current_token = ""
+            else:
+                current_token += c
+
+        if current_token:
+            tokens.append(current_token)
+
+        # Step 2: First token = class name
+        class_name = tokens[0] if tokens else ""
+        attributes = tokens[1:] if len(tokens) > 1 else []
+
+        if not class_name:
+            print("** class name missing **")
+            return
+        if class_name not in HBNBCommand.classes:
             print("** class doesn't exist **")
             return
-        new_instance = HBNBCommand.classes[args]()
+
+        # Step 3: Create new instance
+        new_instance = eval(class_name)()
+
+        # Step 4: Process parameters
+        for param in attributes:
+            # Must contain '='
+            if '=' not in param:
+                continue
+
+            key, value = param.split('=', 1)
+
+            # Check if value is quoted string
+            if value.startswith('"') and value.endswith('"') and len(value) >= 2:
+                value_clean = value[1:-1]           # Remove quotes
+                value_clean = value_clean.replace('_', ' ')  # Underscore -> space
+            elif re.match(r'^-?\d+\.\d+$', value):  # Float
+                try:
+                    value_clean = float(value)
+                except ValueError:
+                    continue
+            elif re.match(r'^-?\d+$', value):       # Integer
+                try:
+                    value_clean = int(value)
+                except ValueError:
+                    continue
+            else:
+                # Invalid token: skip
+                continue
+
+            setattr(new_instance, key, value_clean)
+
+        # Step 5: Save object
+        storage.new(new_instance)
         storage.save()
         print(new_instance.id)
-        storage.save()
 
     def help_create(self):
         """ Help information for the create method """
