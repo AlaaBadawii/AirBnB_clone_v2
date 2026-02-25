@@ -13,7 +13,7 @@ class FileStorage:
         if cls is not None:
             filtered_objects = {}
             for key, obj in FileStorage.__objects.items():
-                if obj.__class__.__name__ == cls:
+                if obj.__class__.__name__ == cls or obj.__class__ == cls:
                     filtered_objects[key] = obj
             return filtered_objects
         return FileStorage.__objects

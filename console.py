@@ -1,6 +1,9 @@
 #!/usr/bin/python3
 """ Console Module """
+from ast import arg
 import cmd
+from shlex import shlex
+import shlex
 import sys
 from models.base_model import BaseModel
 from models.__init__ import storage
@@ -113,51 +116,41 @@ class HBNBCommand(cmd.Cmd):
         """ Overrides the emptyline method of CMD """
         pass
 
+    def _key_value_parser(self, args):
+        """creates a dictionary from a list of strings"""
+        new_dict = {}
+        for arg in args:
+            if "=" in arg:
+                kvp = arg.split('=', 1)
+                key = kvp[0]
+                value = kvp[1]
+                if value[0] == value[-1] == '"':
+                    value = shlex.split(value)[0].replace('_', ' ')
+                else:
+                    try:
+                        value = int(value)
+                    except BaseException:
+                        try:
+                            value = float(value)
+                        except BaseException:
+                            continue
+                new_dict[key] = value
+        return new_dict
+
     def do_create(self, args):
-        """ Create an object of any class"""
-        if not args:
-            print("** class name missing **")
-            return
-
+        """Creates a new instance of a class"""
         args = args.split()
-        class_name = args[0]
-
-        if class_name not in HBNBCommand.classes:
+        if len(args) == 0:
+            print("** class name missing **")
+            return False
+        if args[0] in HBNBCommand.classes:
+            new_dict = self._key_value_parser(args[1:])
+            instance = HBNBCommand.classes[args[0]](**new_dict)
+        else:
             print("** class doesn't exist **")
-            return
-
-        new_instance = eval(class_name)()
-
-        for parm in args[1:]:
-            if "=" not in parm:
-                continue
-
-            key, value = parm.split("=", 1)
-
-            # String
-            if value[0] == '"' and value[-1] == '"':
-                value = value[1:-1]
-                value = value.replace('\\"', '"').replace('_', ' ')
-                setattr(new_instance, key, value)
-
-            # Float
-            elif '.' in value:
-                try:
-                    setattr(new_instance, key, float(value))
-                except ValueError:
-                    continue
-
-            # Integer
-            else:
-                try:
-                    setattr(new_instance, key, int(value))
-                except ValueError:
-                    continue
-
-            setattr(new_instance, key, value)
-
-        new_instance.save()
-        print(new_instance.id)
+            return False
+        print(instance.id)
+        instance.save()
 
     def help_create(self):
         """ Help information for the create method """
