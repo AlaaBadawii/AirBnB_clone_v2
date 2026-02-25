@@ -113,33 +113,68 @@ class HBNBCommand(cmd.Cmd):
         """ Overrides the emptyline method of CMD """
         pass
 
-    def do_create(self, args):
-        """ Create an object of any class"""
-        class_name, *other_args = args.split()
-        if not class_name:
+    def do_create(self, arg):
+        """Creates a new instance: create <class name> <param1> <param2>..."""
+        if not arg:
             print("** class name missing **")
             return
-        elif class_name not in HBNBCommand.classes:
+        
+        # Parse class name from args
+        args = arg.split(maxsplit=1)
+        class_name = args[0]
+        
+        if class_name not in HBNBCommand.classes:
             print("** class doesn't exist **")
             return
-        new_instance = eval(class_name)()
-
-        for arg in other_args:
-            key, value = arg.split('=')
-            if value[0] == value[-1] == '"':
-                value = value[1:-1].replace('_', ' ')
-            else:
+        
+        # Create base instance
+        new_instance = HBNBCommand.classes[class_name]()
+        
+        # If there are additional parameters
+        if len(args) > 1:
+            params_str = args[1]
+            
+            # Check if it's a dictionary format (like in update)
+            if '{' in params_str and '}' in params_str:
                 try:
-                    value = int(value)
-                except ValueError:
-                    try:
-                        value = float(value)
-                    except ValueError:
-                        pass
-            setattr(new_instance, key, value)
-        storage.new(new_instance)
+                    params_dict = eval(params_str)
+                    if isinstance(params_dict, dict):
+                        for key, value in params_dict.items():
+                            setattr(new_instance, key, value)
+                except:
+                    pass
+            else:
+                # Parse key=value pairs
+                import shlex
+                try:
+                    params_list = shlex.split(params_str)
+                    for param in params_list:
+                        if '=' in param:
+                            key, value = param.split('=', 1)
+                            
+                            # Handle value types
+                            if value.startswith('"'):
+                                # String
+                                value = value[1:-1].replace('\\"', '"').replace('_', ' ')
+                            elif '.' in value:
+                                # Float
+                                try:
+                                    value = float(value)
+                                except ValueError:
+                                    continue
+                            else:
+                                # Integer
+                                try:
+                                    value = int(value)
+                                except ValueError:
+                                    continue
+                            
+                            setattr(new_instance, key, value)
+                except:
+                    pass
+        
+        new_instance.save()
         print(new_instance.id)
-        storage.save()
 
     def help_create(self):
         """ Help information for the create method """
