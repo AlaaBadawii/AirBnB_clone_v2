@@ -126,9 +126,17 @@ class HBNBCommand(cmd.Cmd):
 
         for arg in other_args:
             key, value = arg.split('=')
-            value = value.strip('"').replace('_', ' ')
+            if value[0] == value[-1] == '"':
+                value = value[1:-1].replace('_', ' ')
+            else:
+                try:
+                    value = int(value)
+                except ValueError:
+                    try:
+                        value = float(value)
+                    except ValueError:
+                        pass
             setattr(new_instance, key, value)
-
         storage.new(new_instance)
         print(new_instance.id)
         storage.save()
