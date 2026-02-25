@@ -143,14 +143,14 @@ class HBNBCommand(cmd.Cmd):
             # Float
             elif '.' in value:
                 try:
-                    setattr(new_instance, value, key)
+                    setattr(new_instance, key, float(value))
                 except ValueError:
                     continue
 
             # Integer
             else:
                 try:
-                    setattr(new_instance, value, key)
+                    setattr(new_instance, key, int(value))
                 except ValueError:
                     continue
 
