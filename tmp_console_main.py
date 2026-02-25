@@ -73,7 +73,7 @@ class HBNBCommand(cmd.Cmd):
                 pline = pline[2].strip()  # pline is now str
                 if pline:
                     # check for *args or **kwargs
-                    if pline[0] == '{' and pline[-1] == '}'\
+                    if pline[0] is '{' and pline[-1] is'}'\
                             and type(eval(pline)) is dict:
                         _args = pline
                     else:
@@ -113,49 +113,91 @@ class HBNBCommand(cmd.Cmd):
         """ Overrides the emptyline method of CMD """
         pass
 
-    def do_create(self, args):
-        """ Create an object of any class"""
-        if not args:
+    def do_create(self, arg):
+        """Creates a new instance: create <class name> <param1> <param2>..."""
+        if not arg:
             print("** class name missing **")
             return
-
-        args = args.split()
-        class_name = args[0]
-
+        
+        # Parse class name from args
+        parts = arg.split(maxsplit=1)
+        class_name = parts[0]
+        
         if class_name not in HBNBCommand.classes:
             print("** class doesn't exist **")
             return
-
-        new_instance = eval(class_name)()
-
-        for parm in args[1:]:
-            if "=" not in parm:
-                continue
-
-            key, value = parm.split("=", 1)
-
-            # String
-            if value[0] == '"' and value[-1] == '"':
-                value = value[1:-1]
-                value = value.replace('\\"', '"').replace('_', ' ')
+        
+        # Create base instance
+        new_instance = HBNBCommand.classes[class_name]()
+        
+        # If there are additional parameters
+        if len(parts) > 1:
+            params_str = parts[1]
+            
+            # Parse parameters manually (without shlex which might cause issues)
+            i = 0
+            length = len(params_str)
+            
+            while i < length:
+                # Skip spaces
+                while i < length and params_str[i] == ' ':
+                    i += 1
+                if i >= length:
+                    break
+                    
+                # Find key
+                key_start = i
+                while i < length and params_str[i] != '=':
+                    i += 1
+                if i >= length or params_str[i] != '=':
+                    break
+                    
+                key = params_str[key_start:i]
+                i += 1  # Skip '='
+                
+                # Parse value
+                if i < length and params_str[i] == '"':
+                    # String value
+                    i += 1  # Skip opening quote
+                    value_start = i
+                    value_parts = []
+                    
+                    while i < length:
+                        if params_str[i] == '\\' and i + 1 < length and params_str[i + 1] == '"':
+                            # Escaped quote
+                            value_parts.append('"')
+                            i += 2
+                        elif params_str[i] == '"':
+                            # Closing quote
+                            i += 1
+                            break
+                        else:
+                            value_parts.append(params_str[i])
+                            i += 1
+                    
+                    value = ''.join(value_parts)
+                    # Replace underscores with spaces
+                    value = value.replace('_', ' ')
+                    
+                else:
+                    # Number value (int or float)
+                    value_start = i
+                    while i < length and params_str[i] != ' ':
+                        i += 1
+                    value_str = params_str[value_start:i]
+                    
+                    try:
+                        if '.' in value_str:
+                            value = float(value_str)
+                        else:
+                            value = int(value_str)
+                    except ValueError:
+                        # Skip invalid number
+                        continue
+                
+                # Set attribute
                 setattr(new_instance, key, value)
-
-            # Float
-            elif '.' in value:
-                try:
-                    setattr(new_instance, value, key)
-                except ValueError:
-                    continue
-
-            # Integer
-            else:
-                try:
-                    setattr(new_instance, value, key)
-                except ValueError:
-                    continue
-
-            setattr(new_instance, key, value)
-
+        
         new_instance.save()
         print(new_instance.id)
 
@@ -220,7 +262,7 @@ class HBNBCommand(cmd.Cmd):
         key = c_name + "." + c_id
 
         try:
-            del (storage.all()[key])
+            del(storage.all()[key])
             storage.save()
         except KeyError:
             print("** no instance found **")
@@ -305,7 +347,7 @@ class HBNBCommand(cmd.Cmd):
                 args.append(v)
         else:  # isolate args
             args = args[2]
-            if args and args[0] == '\"': # check for quoted arg
+            if args and args[0] is '\"':  # check for quoted arg
                 second_quote = args.find('\"', 1)
                 att_name = args[1:second_quote]
                 args = args[second_quote + 1:]
@@ -313,10 +355,10 @@ class HBNBCommand(cmd.Cmd):
             args = args.partition(' ')
 
             # if att_name was not quoted arg
-            if not att_name and args[0] != ' ':
+            if not att_name and args[0] is not ' ':
                 att_name = args[0]
             # check for quoted val arg
-            if args[2] and args[2][0] == '\"':
+            if args[2] and args[2][0] is '\"':
                 att_val = args[2][1:args[2].find('\"', 1)]
 
             # if att_val was not quoted arg
@@ -352,7 +394,6 @@ class HBNBCommand(cmd.Cmd):
         """ Help information for the update class """
         print("Updates an object with new information")
         print("Usage: update <className> <id> <attName> <attVal>\n")
-
 
 if __name__ == "__main__":
     HBNBCommand().cmdloop()
