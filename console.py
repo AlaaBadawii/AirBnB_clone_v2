@@ -10,8 +10,6 @@ from models.state import State
 from models.city import City
 from models.amenity import Amenity
 from models.review import Review
-import shlex
-
 
 
 class HBNBCommand(cmd.Cmd):
@@ -115,44 +113,48 @@ class HBNBCommand(cmd.Cmd):
         """ Overrides the emptyline method of CMD """
         pass
 
-
-    def do_create(self, arg):
-        """Create an instance of a class with parameters"""
-        if not arg:
+    def do_create(self, args):
+        """ Create an object of any class"""
+        if not args:
             print("** class name missing **")
             return
 
-        args = shlex.split(arg)
+        args = args.split()
         class_name = args[0]
 
         if class_name not in HBNBCommand.classes:
             print("** class doesn't exist **")
             return
 
-        new_instance = HBNBCommand.classes[class_name]()
+        new_instance = eval(class_name)()
 
-        for param in args[1:]:
-            if "=" not in param:
+        for parm in args[1:]:
+            if "=" not in parm:
                 continue
 
-            key, value = param.split("=", 1)
+            key, value = parm.split("=", 1)
 
-            if value.startswith('"') and value.endswith('"'):
+            # String
+            if value[0] == '"' and value[-1] == '"':
                 value = value[1:-1]
-                value = value.replace('\\"', '"')
-                value = value.replace('_', ' ')
+                value = value.replace('\\"', '"').replace('_', ' ')
                 setattr(new_instance, key, value)
 
-            elif "." in value:
+            # Float
+            elif '.' in value:
                 try:
-                    setattr(new_instance, key, float(value))
+                    setattr(new_instance, value, key)
                 except ValueError:
                     continue
+
+            # Integer
             else:
                 try:
-                    setattr(new_instance, key, int(value))
+                    setattr(new_instance, value, key)
                 except ValueError:
                     continue
+
+            setattr(new_instance, key, value)
 
         new_instance.save()
         print(new_instance.id)
