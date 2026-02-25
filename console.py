@@ -127,17 +127,78 @@ class HBNBCommand(cmd.Cmd):
             print("** class doesn't exist **")
             return
         
-        # Create the instance
+        # Create base instance
         new_instance = HBNBCommand.classes[class_name]()
-        new_instance.save()
         
-        # If there are additional parameters, reuse do_update
+        # If there are additional parameters
         if len(parts) > 1:
-            # Format: <class_name> <id> <rest of params>
-            update_args = f"{class_name} {new_instance.id} {parts[1]}"
-            self.do_update(update_args)
+            params_str = parts[1]
+            
+            # Parse parameters manually (without shlex which might cause issues)
+            i = 0
+            length = len(params_str)
+            
+            while i < length:
+                # Skip spaces
+                while i < length and params_str[i] == ' ':
+                    i += 1
+                if i >= length:
+                    break
+                    
+                # Find key
+                key_start = i
+                while i < length and params_str[i] != '=':
+                    i += 1
+                if i >= length or params_str[i] != '=':
+                    break
+                    
+                key = params_str[key_start:i]
+                i += 1  # Skip '='
+                
+                # Parse value
+                if i < length and params_str[i] == '"':
+                    # String value
+                    i += 1  # Skip opening quote
+                    value_start = i
+                    value_parts = []
+                    
+                    while i < length:
+                        if params_str[i] == '\\' and i + 1 < length and params_str[i + 1] == '"':
+                            # Escaped quote
+                            value_parts.append('"')
+                            i += 2
+                        elif params_str[i] == '"':
+                            # Closing quote
+                            i += 1
+                            break
+                        else:
+                            value_parts.append(params_str[i])
+                            i += 1
+                    
+                    value = ''.join(value_parts)
+                    # Replace underscores with spaces
+                    value = value.replace('_', ' ')
+                    
+                else:
+                    # Number value (int or float)
+                    value_start = i
+                    while i < length and params_str[i] != ' ':
+                        i += 1
+                    value_str = params_str[value_start:i]
+                    
+                    try:
+                        if '.' in value_str:
+                            value = float(value_str)
+                        else:
+                            value = int(value_str)
+                    except ValueError:
+                        # Skip invalid number
+                        continue
+                
+                # Set attribute
+                setattr(new_instance, key, value)
         
-        # Print ID (do_update doesn't print anything)
+        new_instance.save()
         print(new_instance.id)
 
     def help_create(self):
