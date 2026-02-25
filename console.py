@@ -120,60 +120,24 @@ class HBNBCommand(cmd.Cmd):
             return
         
         # Parse class name from args
-        args = arg.split(maxsplit=1)
-        class_name = args[0]
+        parts = arg.split(maxsplit=1)
+        class_name = parts[0]
         
         if class_name not in HBNBCommand.classes:
             print("** class doesn't exist **")
             return
         
-        # Create base instance
+        # Create the instance
         new_instance = HBNBCommand.classes[class_name]()
-        
-        # If there are additional parameters
-        if len(args) > 1:
-            params_str = args[1]
-            
-            # Check if it's a dictionary format (like in update)
-            if '{' in params_str and '}' in params_str:
-                try:
-                    params_dict = eval(params_str)
-                    if isinstance(params_dict, dict):
-                        for key, value in params_dict.items():
-                            setattr(new_instance, key, value)
-                except:
-                    pass
-            else:
-                # Parse key=value pairs
-                import shlex
-                try:
-                    params_list = shlex.split(params_str)
-                    for param in params_list:
-                        if '=' in param:
-                            key, value = param.split('=', 1)
-                            
-                            # Handle value types
-                            if value.startswith('"'):
-                                # String
-                                value = value[1:-1].replace('\\"', '"').replace('_', ' ')
-                            elif '.' in value:
-                                # Float
-                                try:
-                                    value = float(value)
-                                except ValueError:
-                                    continue
-                            else:
-                                # Integer
-                                try:
-                                    value = int(value)
-                                except ValueError:
-                                    continue
-                            
-                            setattr(new_instance, key, value)
-                except:
-                    pass
-        
         new_instance.save()
+        
+        # If there are additional parameters, reuse do_update
+        if len(parts) > 1:
+            # Format: <class_name> <id> <rest of params>
+            update_args = f"{class_name} {new_instance.id} {parts[1]}"
+            self.do_update(update_args)
+        
+        # Print ID (do_update doesn't print anything)
         print(new_instance.id)
 
     def help_create(self):
