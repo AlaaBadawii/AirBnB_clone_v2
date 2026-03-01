@@ -140,3 +140,30 @@ Usage: <class_name>.update(<_id>, <dictionary>)
 (hbnb) ["[User] (98bea5de-9cb0-4d78-8a9d-c4de03521c30) {'updated_at': datetime.datetime(2020, 2, 19, 21, 47, 29, 134362), 'name': 'Fred the Frog', 'age': 9, 'id': '98bea5de-9cb0-4d78-8a9d-c4de03521c30', 'created_at': datetime.datetime(2020, 2, 19, 21, 47, 29, 134343)}"]
 ```
 <br>
+
+## Enhancements & DB Storage Integration
+
+In this stage of the project, I extended the AirBnB console to support **database storage using SQLAlchemy ORM**, while preserving the existing **FileStorage system**. The system automatically selects storage based on an environment variable:
+
+- If `HBNB_TYPE_STORAGE=db`, the system uses **DBStorage**.
+- If not set or set to any other value, the system defaults to **FileStorage**.
+
+This demonstrates the ability to **continue development from existing code**, integrate new features without breaking existing functionality, and work with ORM for persistent data storage.
+
+### Setup & Usage
+
+1. Ensure you have MySQL installed and running.
+2. Set the environment variable:
+```bash
+export HBNB_TYPE_STORAGE=db
+export HBNB_MYSQL_USER=<your_user>
+export HBNB_MYSQL_PWD=<your_password>
+export HBNB_MYSQL_HOST=localhost
+export HBNB_MYSQL_DB=hbnb_dev_db
+
+./console.py
+
+(hbnb) create User
+(hbnb) show User 1234-abcd-5678
+(hbnb) User.update("1234-abcd-5678", {"name": "Alice", "age": 25})
+(hbnb) User.all()
