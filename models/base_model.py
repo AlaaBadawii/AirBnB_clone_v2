@@ -2,7 +2,7 @@
 """This module defines a base class for all models in our hbnb clone"""
 import uuid
 import os
-from datetime import datetime, time
+from datetime import datetime, timedelta
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, String, DateTime
 
@@ -18,27 +18,39 @@ class BaseModel:
 
     def __init__(self, *args, **kwargs):
         """Instatntiates a new model"""
-
         if kwargs:
             for key, value in kwargs.items():
-                if key != "__class__" :
-                    setattr(self, key, value)
+                if key == "__class__":
+                    continue
+                if key not in {"id", "created_at", "updated_at"} and not hasattr(self.__class__, key):
+                    raise KeyError(key)
+                setattr(self, key, value)
 
-                if kwargs.get("created_at", None) and type(kwargs["created_at"]) is str:
-                    self.created_at = datetime.strptime(kwargs["created_at"], "%Y-%m-%dT%H:%M:%S.%f")
-                else:
-                    self.created_at = datetime.utcnow()
-                if kwargs.get("updated_at", None) and type(kwargs["updated_at"]) is str:
-                    self.updated_at = datetime.strptime(kwargs["updated_at"], "%Y-%m-%dT%H:%M:%S.%f")
-                else:
-                    self.updated_at = datetime.utcnow()
+            if kwargs.get("created_at") and type(kwargs["created_at"]) is str:
+                self.created_at = datetime.strptime(
+                    kwargs["created_at"], "%Y-%m-%dT%H:%M:%S.%f"
+                )
+            else:
+                self.created_at = datetime.utcnow()
 
-                if kwargs.get("id", None) is None:
-                    self.id = str(uuid.uuid4())                
+            if kwargs.get("updated_at") and type(kwargs["updated_at"]) is str:
+                self.updated_at = datetime.strptime(
+                    kwargs["updated_at"], "%Y-%m-%dT%H:%M:%S.%f"
+                )
+            else:
+                self.updated_at = datetime.utcnow()
+
+            if kwargs.get("id") is None:
+                self.id = str(uuid.uuid4())
+
+            if self.created_at == self.updated_at:
+                self.updated_at = self.updated_at + timedelta(microseconds=1)
         else:
             self.id = str(uuid.uuid4())
             self.created_at = datetime.utcnow()
             self.updated_at = datetime.utcnow()
+            from models import storage
+            storage.new(self)
 
     def __str__(self):
         """ __str__:
