@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<HTML lang="en">
+
+<HEAD>
+    <TITLE>HBNB</TITLE>
+</HEAD>
+
+<BODY>
+    {% if state is defined and state %}
+    <h1>State: {{ state.name }}</h1>
+    <ul>
+        <h3>Cities.</h3>
+        {% for city in state.cities %}
+        <li>City:{{ city.id }}: <B>{{ city.name }}</B></li>
+        {% endfor %}
+    </ul>
+    {% elif states is defined %}
+    <h1>States</h1>
+    <ul>
+        {% for st in states %}
+        <li>{{ st.id }}: <B>{{ st.name }}</B></li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <h1>Not found!</h1>
+    {% endif %}
+</BODY>
+
+</HTML>
