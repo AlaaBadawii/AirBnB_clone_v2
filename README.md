@@ -112,6 +112,133 @@ Usage: update <class_name> <_id>
 Usage: <class_name>.all()
 ```
 (hbnb) User.all()
+
+---
+
+# 0x04. AirBnB Clone – Web Framework
+## Project Overview
+
+This project focuses on creating a minimal web framework using Flask to serve dynamic content for an AirBnB clone. It emphasizes the connection between the backend server, database storage, and template rendering. The objective is to understand how a web framework works, how dynamic routing and templating function, and how to integrate persistent storage into a web application.
+
+## Concepts & Learning Objectives
+
+- Understand the role of a web framework in backend development.
+- Configure a Flask server and define dynamic routes.
+- Render HTML templates with Jinja, using loops, conditions, and dynamic content.
+- Integrate MySQL database access through ORM (SQLAlchemy).
+- Properly manage sessions with teardown methods.
+- Extend storage engines and models to support retrieval and cleanup.
+
+## Tasks Implemented
+0. Hello Flask!
+Flask app running on 0.0.0.0:5000
+Route / displays: “Hello HBNB!”
+
+1. HBNB
+Route /hbnb displays: “HBNB”
+
+2. C is fun!
+Dynamic route /c/<text> replaces underscores with spaces.
+
+3. Python is cool!
+Dynamic route /python/<text> with default value "is cool"
+
+4. Is it a number?
+Route /number/<n> displays only if <n> is an integer
+
+5. Number template
+Route /number_template/<n> renders a dynamic HTML page showing the integer
+
+6. Odd or even?
+Route /number_odd_or_even/<n> renders HTML displaying “Number: n is even|odd”
+
+7. Improve engines
+Updated FileStorage and DBStorage with close() for session management
+Added cities getter in State model to return related City objects
+
+8. List of states
+/states_list dynamically lists all states from storage
+Proper session teardown using @app.teardown_appcontext
+
+9. Cities by states
+/cities_by_states lists all states and their corresponding cities
+Supports both FileStorage and DBStorage
+Sorted results alphabetically
+
+## Repository Structure
+AirBnB_clone_v2/
+├── web_flask/
+│   ├── 0-hello_route.py
+│   ├── 1-hbnb_route.py
+│   ├── 2-c_route.py
+│   ├── 3-python_route.py
+│   ├── 4-number_route.py
+│   ├── 5-number_template.py
+│   ├── 6-number_odd_or_even.py
+│   ├── 7-states_list.py
+│   ├── 8-cities_by_states.py
+│   └── templates/
+│       ├── 5-number.html
+│       ├── 6-number_odd_or_even.html
+│       ├── 7-states_list.html
+│       └── 8-cities_by_states.html
+├── models/
+│   ├── engine/
+│   │   ├── file_storage.py
+│   │   └── db_storage.py
+│   ├── state.py
+│   └── city.py
+└── README.md
+
+## Setup Instructions
+
+Install Flask:
+
+pip3 install Flask
+
+Run the Flask app:
+
+python3 -m web_flask.<task_number>
+
+For DBStorage tasks, ensure MySQL is properly configured:
+
+HBNB_MYSQL_USER=hbnb_dev HBNB_MYSQL_PWD=hbnb_dev_pwd \
+HBNB_MYSQL_HOST=localhost HBNB_MYSQL_DB=hbnb_dev_db \
+HBNB_TYPE_STORAGE=db python3
+
+## Key Takeaways
+
+- Built a Flask-based web server with dynamic content.
+- Integrated storage engines with proper session management.
+- Implemented dynamic routing and conditional HTML rendering.
+- Gained practical experience with backend web frameworks, templates, and database ORM integration.
+
+## New Sections – LinkedIn & Portfolio Ready
+### Skills Demonstrated
+
+- Backend development with Python & Flask
+- Dynamic routing, template rendering, and Jinja logic
+- Database integration using SQLAlchemy ORM
+- Session management and engine teardown
+- Full-stack understanding of web frameworks and storage engines
+
+### Real-world Application
+
+- Serves as a foundation for building scalable web applications
+- Can be extended for multi-user systems with persistent data
+- Demonstrates understanding of MVC architecture and backend best practices
+
+### Highlights
+
+- Completed 9 dynamic routes with HTML rendering and database integration
+- Implemented alphabetical sorting and dynamic object retrieval
+- Ensured compatibility with both file-based and database storage
+
+## Suggestions
+
+- Add a dedicated “Setup (DB)” section with explicit MySQL version, charset, and collation guidance to avoid FK mismatches.
+- Include a quickstart script or Makefile target to export environment variables and run Flask consistently.
+- Add basic integration tests for the Flask routes and a short “How to run tests” section.
 ["[User] (99f45908-1d17-46d1-9dd2-b7571128115b) {'updated_at': datetime.datetime(2020, 2, 19, 21, 47, 34, 92071), 'id': '99f45908-1d17-46d1-9dd2-b7571128115b', 'created_at': datetime.datetime(2020, 2, 19, 21, 47, 34, 92056)}", "[User] (98bea5de-9cb0-4d78-8a9d-c4de03521c30) {'updated_at': datetime.datetime(2020, 2, 19, 21, 47, 29, 134362), 'id': '98bea5de-9cb0-4d78-8a9d-c4de03521c30', 'created_at': datetime.datetime(2020, 2, 19, 21, 47, 29, 134343)}"]
 ```
 
