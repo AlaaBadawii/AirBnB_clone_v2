@@ -15,6 +15,10 @@ class State(BaseModel, BaseClass):
     """ State class """
     if storage_type == 'db':
         __tablename__ = "states"
+        __table_args__ = {
+            "mysql_charset": "utf8mb4",
+            "mysql_collate": "utf8mb4_unicode_ci",
+        }
         name = Column(String(128), nullable=False)
         cities = relationship("City", backref="state", cascade="all, delete")
     else:

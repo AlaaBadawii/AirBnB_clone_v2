@@ -12,6 +12,10 @@ class Review(BaseModel, BaseClass):
     """ Review classto store review information """
     if storage_type == "db":
         __tablename__ = "reviews"
+        __table_args__ = {
+            "mysql_charset": "utf8mb4",
+            "mysql_collate": "utf8mb4_unicode_ci",
+        }
         place_id = Column(String(60), ForeignKey("places.id"), nullable=False)
         user_id = Column(String(60), ForeignKey("users.id"), nullable=False)
         text = Column(String(1024), nullable=False)

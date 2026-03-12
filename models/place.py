@@ -13,6 +13,8 @@ place_amenity = Table(
     Base.metadata,
     Column("place_id", String(60), ForeignKey("places.id"), primary_key=True, nullable=False),
     Column("amenity_id", String(60), ForeignKey("amenities.id"), primary_key=True, nullable=False),
+    mysql_charset="utf8mb4",
+    mysql_collate="utf8mb4_unicode_ci",
 )
 
 
@@ -20,6 +22,10 @@ class Place(BaseModel, BaseClass):
     """ A place to stay """
     if storage_type == "db":
         __tablename__ = "places"
+        __table_args__ = {
+            "mysql_charset": "utf8mb4",
+            "mysql_collate": "utf8mb4_unicode_ci",
+        }
         city_id = Column(String(60), ForeignKey("cities.id"), nullable=False)
         user_id = Column(String(60), ForeignKey("users.id"), nullable=False)
         name = Column(String(128), nullable=False)

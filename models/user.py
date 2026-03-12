@@ -13,6 +13,10 @@ class User(BaseModel, BaseClass):
     """This class defines a user by various attributes"""
     if storage_type == "db":
         __tablename__ = "users"
+        __table_args__ = {
+            "mysql_charset": "utf8mb4",
+            "mysql_collate": "utf8mb4_unicode_ci",
+        }
         email = Column(String(128), nullable=False)
         password = Column(String(128), nullable=False)
         first_name = Column(String(128), nullable=True)

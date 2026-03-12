@@ -14,6 +14,10 @@ class Amenity(BaseModel, BaseClass):
     """ Amenity class """
     if storage_type == "db":
         __tablename__ = "amenities"
+        __table_args__ = {
+            "mysql_charset": "utf8mb4", # Use full Unicode charset to support all characters including emojis
+            "mysql_collate": "utf8mb4_unicode_ci", # Case-insensitive Unicode collation for consistent text sorting/comparisons
+        }
         name = Column(String(128), nullable=False)
         place_amenities = relationship(
             "Place",
